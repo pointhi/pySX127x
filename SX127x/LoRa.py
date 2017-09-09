@@ -75,13 +75,13 @@ def setter(register_address):
 
 class LoRa(object):
 
-    spi = BOARD.SpiDev()              # init and get the baord's SPI
+    spi = None
     mode = None                       # the mode is backed up here
     backup_registers = []
     verbose = True
     dio_mapping = [None] * 6          # store the dio mapping here
 
-    def __init__(self, verbose=True, do_calibration=True, calibration_freq=868):
+    def __init__(self, board=BOARD, verbose=True, do_calibration=True, calibration_freq=868):
         """ Init the object
         
         Send the device to sleep, read all registers, and do the calibration (if do_calibration=True)
@@ -90,8 +90,9 @@ class LoRa(object):
         :param do_calibration: Call rx_chain_calibration, default is True.
         """
         self.verbose = verbose
+        self.spi = board.SpiDev()    # init and get the board's SPI
         # set the callbacks for DIO0..5 IRQs.
-        BOARD.add_events(self._dio0, self._dio1, self._dio2, self._dio3, self._dio4, self._dio5)
+        board.add_events(self._dio0, self._dio1, self._dio2, self._dio3, self._dio4, self._dio5)
         # set mode to sleep and read all registers
         self.set_mode(MODE.SLEEP)
         self.backup_registers = self.get_all_registers()
